@@ -85,11 +85,13 @@ export default function SubmitForm() {
         <div className="field"><label>Vehicle</label><input name="vehicle" placeholder="Make, model, color, plate" /></div>
         <div className="field"><label>Medical conditions relevant to their safety</label><input name="medical" /></div>
         <div className="field"><label>What happened / anything else people should know</label><textarea name="summary" placeholder="Keep it factual. This text may be published on the case page." /></div>
-        {hasFormspree ? (
-          <div className="field"><label>Photo <span className="req">*</span></label><input name="photo" type="file" accept="image/*" required /><span className="hint">Clear, recent face photo.</span></div>
-        ) : (
-          <div className="notice" style={{ margin: 0 }}><p className="small" style={{ margin: 0 }}>You&apos;ll attach the photo to the email that opens after you click submit.</p></div>
-        )}
+        <div className="notice" style={{ margin: 0 }}>
+          <p className="small" style={{ margin: 0 }}>
+            <strong>Photo:</strong> {hasFormspree
+              ? "after you submit, we'll reply to your email to request the clearest, most recent face photo you have."
+              : "you'll attach the photo to the email that opens after you click submit."}
+          </p>
+        </div>
       </div>
 
       <div className="card form">

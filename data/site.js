@@ -14,7 +14,7 @@ export const site = {
   // Formspree form ID (free account at https://formspree.io).
   // Create a form, copy the ID from the endpoint URL (https://formspree.io/f/XXXXXXXX)
   // and paste it here. Until you do, the forms fall back to opening an email.
-  formspreeId: "",
+  formspreeId: "mwlvqykp",
 
   // Optional social links (leave blank to hide).
   social: {
