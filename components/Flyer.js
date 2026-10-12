@@ -1,60 +1,75 @@
 import { formatDate } from "@/lib/states";
 
-/* The printable 8.5x11 flyer. Rendered at a fixed 816px width (96 dpi letter) and scaled with CSS for preview. */
+const cut = (str, n) => (str && str.length > n ? str.slice(0, n - 1).trimEnd() + "…" : str || "");
+const nameSize = (n) => (n.length > 30 ? 30 : n.length > 22 ? 36 : 46);
+
+const headline = (t) =>
+  t === "child" ? "Missing Child — Please Help"
+  : t === "elder" ? "Missing Senior — May Be Disoriented"
+  : t === "medical" ? "Missing — Needs Medical Care"
+  : "Have You Seen This Person?";
+
+/* Printable 8.5x11 flyer. Fixed 816x1056 (letter at 96 dpi); the photo flexes to fill leftover space. */
 export function Flyer({ d, innerRef }) {
   const facts = [
     ["Age", d.age], ["Height", d.height], ["Weight", d.weight], ["Hair", d.hair], ["Eyes", d.eyes],
     ["Marks / Tattoos", d.marks], ["Medical", d.medical], ["Vehicle", d.vehicle],
-  ].filter(([, v]) => v);
+  ].filter(([, v]) => v).map(([k, v]) => [k, cut(v, 58)]);
+  const name = cut(d.name || "Full Name", 40);
 
   return (
     <div className="flyer" ref={innerRef}>
       <h1 className="flyer-title">Missing</h1>
-      <p className="flyer-sub">{d.caseType === "child" ? "Missing Child — Please Help" : d.caseType === "elder" ? "Missing Senior — May Be Disoriented" : d.caseType === "medical" ? "Missing — Needs Medical Care" : "Have You Seen This Person?"}</p>
-      <div className="flyer-photo">{d.photo ? <img src={d.photo} alt="" /> : <span>PHOTO</span>}</div>
-      <h2 className="flyer-name">{d.name || "Full Name"}</h2>
-      <div className="flyer-facts">
-        {facts.map(([k, v]) => (<div key={k}><span>{k}</span>{v}</div>))}
-      </div>
+      <p className="flyer-sub">{headline(d.caseType)}</p>
+      <div className={`flyer-photo${d.photo ? "" : " flyer-photo-empty"}`} style={d.photo ? { backgroundImage: `url(${d.photo})` } : undefined}>{!d.photo && <span>PHOTO</span>}</div>
+      <h2 className="flyer-name" style={{ fontSize: nameSize(name) }}>{name}</h2>
+      {facts.length > 0 && (
+        <div className="flyer-facts">
+          {facts.map(([k, v]) => (<div key={k}><span>{k}</span>{v}</div>))}
+        </div>
+      )}
       <div className="flyer-lastseen">
-        <strong>LAST SEEN:</strong> {d.dateMissing ? formatDate(d.dateMissing) : "Date"}{d.location ? ` — ${d.location}` : ""}
-        {d.wearing && <><br /><strong>WEARING:</strong> {d.wearing}</>}
-        {d.notes && <><br />{d.notes}</>}
+        <strong>LAST SEEN:</strong> {d.dateMissing ? formatDate(d.dateMissing) : "Date"}{d.location ? ` — ${cut(d.location, 80)}` : ""}
+        {d.wearing && <><br /><strong>WEARING:</strong> {cut(d.wearing, 90)}</>}
+        {d.notes && <><br />{cut(d.notes, 170)}</>}
       </div>
       <div className="flyer-contact">
         <p className="sm">IF YOU HAVE ANY INFORMATION, PLEASE CALL</p>
         <p className="big">{d.contactPhone || "000-000-0000"}</p>
-        <p className="sm">{d.contactName || "Investigating agency"}{d.caseNumber ? ` · Case #${d.caseNumber}` : ""} · or dial 911</p>
-        {d.reward && <p className="sm" style={{ marginTop: 6, fontWeight: 800 }}>REWARD: {d.reward}</p>}
+        <p className="sm">{cut(d.contactName || "Investigating agency", 40)}{d.caseNumber ? ` · Case #${d.caseNumber}` : ""} · or dial 911{d.reward ? ` · REWARD: ${d.reward}` : ""}</p>
       </div>
       <p className="flyer-footer">Created free at missinghumans.com · Please share and post</p>
     </div>
   );
 }
 
-/* Square 1080x1080 version for Instagram / Facebook feeds. */
+/* Square 1080x1080 version for Instagram / Facebook feeds. Fixed size; photo flexes. */
 export function SquareFlyer({ d, innerRef }) {
+  const head = { fontFamily: "var(--font-head), Impact, sans-serif", textTransform: "uppercase", lineHeight: 1.15 };
+  const sqName = cut(d.name || "Full Name", 30);
   return (
     <div ref={innerRef} style={{
       width: 1080, height: 1080, background: "#fff", color: "#111", border: "14px solid #c8102e",
-      boxSizing: "border-box", padding: 36, display: "flex", flexDirection: "column", alignItems: "center",
-      fontFamily: "var(--font-body), Arial, sans-serif", textAlign: "center",
+      boxSizing: "border-box", padding: "24px 36px 28px", display: "flex", flexDirection: "column", alignItems: "stretch", gap: 10,
+      fontFamily: "var(--font-body), Arial, sans-serif", textAlign: "center", overflow: "hidden",
     }}>
-      <div style={{ fontFamily: "var(--font-head), Impact, sans-serif", fontSize: 150, lineHeight: .9, color: "#c8102e", textTransform: "uppercase" }}>Missing</div>
-      <div style={{ width: 460, height: 460, background: "#eee", overflow: "hidden", border: "4px solid #111", margin: "18px 0", display: "grid", placeItems: "center", color: "#777" }}>
-        {d.photo ? <img src={d.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "PHOTO"}
+      <div style={{ ...head, fontSize: 124, color: "#c8102e", letterSpacing: ".04em", flex: "0 0 auto", lineHeight: 1.2 }}>Missing</div>
+      <div style={{ fontSize: 24, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", flex: "0 0 auto" }}>{headline(d.caseType)}</div>
+      <div style={{ flex: "1 1 0", minHeight: 160, background: d.photo ? "#fff" : "#eee", overflow: "hidden", border: "4px solid #111", display: "flex", alignItems: "center", justifyContent: "center", color: "#777",
+        backgroundImage: d.photo ? `url(${d.photo})` : "none", backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
+        {!d.photo && "PHOTO"}
       </div>
-      <div style={{ fontFamily: "var(--font-head), Impact, sans-serif", fontSize: 64, textTransform: "uppercase", lineHeight: 1 }}>{d.name || "Full Name"}</div>
-      <div style={{ fontSize: 30, marginTop: 10 }}>
-        {[d.age && `Age ${d.age}`, d.height, d.weight].filter(Boolean).join(" · ")}
+      <div style={{ ...head, fontSize: sqName.length > 22 ? 44 : 60, flex: "0 0 auto" }}>{sqName}</div>
+      <div style={{ fontSize: 28, flex: "0 0 auto" }}>
+        {cut([d.age && `Age ${d.age}`, d.height, d.weight, d.eyes && `${d.eyes} eyes`].filter(Boolean).join(" · "), 60)}
       </div>
-      <div style={{ fontSize: 28, marginTop: 8, maxWidth: 940 }}>
-        Last seen {d.dateMissing ? formatDate(d.dateMissing) : ""}{d.location ? ` — ${d.location}` : ""}
+      <div style={{ fontSize: 26, lineHeight: 1.25, flex: "0 0 auto" }}>
+        Last seen {d.dateMissing ? formatDate(d.dateMissing) : ""}{d.location ? ` — ${cut(d.location, 70)}` : ""}{d.wearing ? `. Wearing ${cut(d.wearing, 60)}` : ""}
       </div>
-      <div style={{ marginTop: "auto", background: "#111", color: "#fff", padding: "18px 30px", width: "100%" }}>
-        <div style={{ fontSize: 24 }}>HAVE INFORMATION? CALL</div>
-        <div style={{ fontFamily: "var(--font-head), Impact, sans-serif", fontSize: 60, lineHeight: 1 }}>{d.contactPhone || "000-000-0000"}</div>
-        <div style={{ fontSize: 22 }}>{d.contactName || "Investigating agency"} · or 911</div>
+      <div style={{ flex: "0 0 auto", background: "#111", color: "#fff", padding: "14px 30px" }}>
+        <div style={{ fontSize: 22 }}>HAVE INFORMATION? CALL</div>
+        <div style={{ ...head, fontSize: 54, margin: "4px 0" }}>{d.contactPhone || "000-000-0000"}</div>
+        <div style={{ fontSize: 20 }}>{cut(d.contactName || "Investigating agency", 40)}{d.caseNumber ? ` · Case #${d.caseNumber}` : ""} · or 911</div>
       </div>
     </div>
   );

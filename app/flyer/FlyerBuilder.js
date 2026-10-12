@@ -61,6 +61,7 @@ export default function FlyerBuilder() {
   const capture = async (node, scaleFactor = 2) => {
     const { default: html2canvas } = await import("html2canvas");
     const sx = window.scrollX, sy = window.scrollY;
+    try { await document.fonts.ready; } catch {}
     try {
       return await html2canvas(node, { scale: scaleFactor, useCORS: true, backgroundColor: "#ffffff", logging: false, scrollX: 0, scrollY: 0, windowWidth: 1200, windowHeight: 1200 });
     } finally { window.scrollTo(sx, sy); document.body.scrollLeft = 0; }
@@ -94,7 +95,21 @@ export default function FlyerBuilder() {
     setBusy("");
   };
 
-  const print = () => window.print();
+  // Print: render the flyer to an image and print just that image on one letter page.
+  const print = async () => {
+    setBusy("print");
+    try {
+      const canvas = await capture(flyerRef.current, 2);
+      const img = canvas.toDataURL("image/jpeg", 0.92);
+      const w = window.open("", "_blank");
+      if (!w) throw new Error("popup blocked");
+      w.document.write(`<!doctype html><html><head><title>Missing person flyer</title>
+<style>@page{size:letter;margin:0.25in}html,body{margin:0;padding:0}img{display:block;width:100%;height:auto;max-height:10.5in;object-fit:contain;margin:0 auto}</style>
+</head><body><img src="${img}" onload="setTimeout(function(){window.focus();window.print();},150)"></body></html>`);
+      w.document.close();
+    } catch (err) { alert("Printing could not start on this device. Download the PDF and print that instead."); }
+    setBusy("");
+  };
 
   const summary = `MISSING: ${d.name || "[Name]"}${d.age ? `, age ${d.age}` : ""}. Last seen ${d.dateMissing ? formatDate(d.dateMissing) : "[date]"}${d.location ? ` near ${d.location}` : ""}.${d.wearing ? ` Wearing ${d.wearing}.` : ""}${d.marks ? ` ${d.marks}.` : ""}${d.medical ? ` ${d.medical}.` : ""}`;
   const callLine = `If you have ANY information, please call ${d.contactName || "police"} at ${d.contactPhone || "[phone]"}${d.caseNumber ? ` (case #${d.caseNumber})` : ""} or dial 911.`;
@@ -186,7 +201,7 @@ export default function FlyerBuilder() {
             <button className="btn btn-urgent" onClick={downloadPDF} disabled={!!busy}>{busy === "pdf" ? "Creating…" : "Download PDF"}</button>
             <button className="btn btn-primary" onClick={() => downloadImage("poster")} disabled={!!busy}>{busy === "poster" ? "Creating…" : "Download image"}</button>
             <button className="btn btn-primary" onClick={() => downloadImage("square")} disabled={!!busy}>{busy === "square" ? "Creating…" : "Square for social"}</button>
-            <button className="btn btn-ghost" onClick={print}>Print</button>
+            <button className="btn btn-ghost" onClick={print} disabled={!!busy}>{busy === "print" ? "Preparing…" : "Print"}</button>
           </div>
           <p className="small muted" style={{ marginTop: 10 }}>
             Print at FedEx Office, Staples, UPS Store, or a library. Ask local businesses, gas stations, and bus stops to post it.
@@ -211,10 +226,8 @@ export default function FlyerBuilder() {
 
       {/* Off-screen, full-size copies used for downloads and printing */}
       <div className="offscreen" aria-hidden>
-        <div className="print-area">
         <Flyer d={d} innerRef={flyerRef} />
         <SquareFlyer d={d} innerRef={squareRef} />
-        </div>
       </div>
     </>
   );
