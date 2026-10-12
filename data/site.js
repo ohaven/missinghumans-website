@@ -9,7 +9,7 @@ export const site = {
   url: "https://missinghumans.com",
 
   // Where case submissions and contact messages go.
-  contactEmail: "contact@missinghumans.com",
+  contactEmail: "signal99haven@gmail.com",
 
   // Formspree form ID (free account at https://formspree.io).
   // Create a form, copy the ID from the endpoint URL (https://formspree.io/f/XXXXXXXX)
