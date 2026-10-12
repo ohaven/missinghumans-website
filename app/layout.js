@@ -7,7 +7,8 @@ export const metadata = {
   metadataBase: new URL(site.url),
   title: { default: `${site.name} — Help Bring Them Home`, template: `%s | ${site.name}` },
   description: site.tagline,
-  openGraph: { title: site.name, description: site.tagline, url: site.url, siteName: site.name, type: "website" },
+  openGraph: { title: `${site.name} — Help Bring Them Home`, description: site.tagline, url: site.url, siteName: site.name, type: "website", images: [{ url: "/og.png", width: 1200, height: 630, alt: "Missing Humans — Help bring them home" }] },
+  twitter: { card: "summary_large_image", title: `${site.name} — Help Bring Them Home`, description: site.tagline, images: ["/og.png"] },
 };
 
 export const viewport = { themeColor: "#0b4f8a" };
