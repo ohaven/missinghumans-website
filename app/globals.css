@@ -196,7 +196,7 @@ button, input, select, textarea { font: inherit; }
 /* The actual flyer: fixed to one US-letter page at 96 dpi (816 x 1056). Photo flexes to fill leftover space. */
 .flyer {
   width: 816px; height: 1056px; background: #fff; color: #111; padding: 28px 40px 24px;
-  font-family: var(--font-body), Arial, sans-serif; display: flex; flex-direction: column; gap: 10px;
+  font-family: Arial, Helvetica, sans-serif; display: flex; flex-direction: column; gap: 10px;
   border: 10px solid #c8102e; box-sizing: border-box; overflow: hidden;
 }
 .flyer-title { font-family: var(--font-head), Impact, sans-serif; font-size: 92px; line-height: 1.15; margin-bottom: 4px; text-align: center; color: #c8102e; letter-spacing: .04em; text-transform: uppercase; margin: 0; flex: 0 0 auto; }

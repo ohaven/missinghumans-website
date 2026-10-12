@@ -51,7 +51,7 @@ export function SquareFlyer({ d, innerRef }) {
     <div ref={innerRef} style={{
       width: 1080, height: 1080, background: "#fff", color: "#111", border: "14px solid #c8102e",
       boxSizing: "border-box", padding: "24px 36px 28px", display: "flex", flexDirection: "column", alignItems: "stretch", gap: 10,
-      fontFamily: "var(--font-body), Arial, sans-serif", textAlign: "center", overflow: "hidden",
+      fontFamily: "Arial, Helvetica, sans-serif", textAlign: "center", overflow: "hidden",
     }}>
       <div style={{ ...head, fontSize: 124, color: "#c8102e", letterSpacing: ".04em", flex: "0 0 auto", lineHeight: 1.2 }}>Missing</div>
       <div style={{ fontSize: 24, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", flex: "0 0 auto" }}>{headline(d.caseType)}</div>
